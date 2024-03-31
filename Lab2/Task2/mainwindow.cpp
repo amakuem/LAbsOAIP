@@ -8,14 +8,21 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     listView = new QListView();
     model = new QStringListModel(this);
+    // QStringList l;
+    // l << "Процессор" << "Видеокарта" << "Оперативная память" << "Материнская плата" << "Жесткий диск(HDD)" << "Твердотелый накопитель(SSD)" << "Блок питания" << "Корпус";
+    // model->setStringList(l);
 
-    QStringList l;
-    l << "Процессор" << "Видеокарта" << "Оперативная память" << "Материнская плата" << "Жесткий диск(HDD)" << "Твердотелый накопитель(SSD)" << "Блок питания" << "Корпус";
-    model->setStringList(l);
 
+    // ui->listView->setModel(model);
+    // ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    ui->listView->setModel(model);
-    ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    model2 = new QStandardItemModel(this);
+    ui->tableView->setModel(model2);
+    ui->tableView->hide();
+
+    connect(ui->comboBoxFirm, SIGNAL(activated(int)), this, SLOT(updateComboBoxFirm()));
+    connect(ui->comboBoxModel, SIGNAL(activated(int)), this, SLOT(updateComboBoxModel()));
+    connect(ui->comboBoxPrice, SIGNAL(activated(int)), this, SLOT(updateComboBoxPrice()));
 }
 
 MainWindow::~MainWindow()
@@ -38,6 +45,7 @@ void MainWindow::on_pushButton_2_clicked()
     QString text = index.data(Qt::DisplayRole).toString();
 
     ui->label->setText(text);
+    currentComponentsInArray();
 }
 
 void MainWindow::openfile()
@@ -118,19 +126,19 @@ void MainWindow::makeBase()
 
     for(int i = 0; i < text.length(); i++)
     {
-        if(i != 0 && information[i] == ' ' && information[i - 1] == ';')
+        if(i != 0 && text[i] == ' ' && text[i - 1] == ';')
         {
             schet++;
             param = false;
             continue;
         }
-        if(information[i] == ':')
+        if(text[i] == ':')
         {
             param = true;
             temp = "";
             continue;
         }
-        else if(information[i] == ';')
+        else if(text[i] == ';')
         {
 
             components[j]->getParametrs(temp);
@@ -191,9 +199,25 @@ void MainWindow::makeBase()
     }
 
     QStringList l;
+    bool stat;
     for(int i = 0; i < kolvo; i++)
     {
-        l << components[i]->retType();
+        stat = true;
+
+        for(int m = 0; m < i; m++)
+        {
+            if(components[i]->retType() == components[m]->retType())
+            {
+                stat = false;
+                break;
+            }
+        }
+
+        if(stat)
+        {
+            l << components[i]->retType();
+        }
+
     }
     model->setStringList(l);
 
@@ -201,4 +225,132 @@ void MainWindow::makeBase()
     ui->listView->setModel(model);
     ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+
+}
+
+void MainWindow::currentComponentsInArray()
+{
+    ui->comboBoxFirm->clear();
+    ui->comboBoxModel->clear();
+    ui->comboBoxPrice->clear();
+    ui->text->clear();
+    ui->yOrN->clear();
+
+    skolko = 0;
+    QModelIndex index = ui->listView->currentIndex();
+
+    for(int i = 0; i < kolvo; i++)
+    {
+        if(components[i]->retType() == index.data(Qt::DisplayRole).toString())
+        {
+            skolko++;
+        }
+    }
+
+    currentComponent = new component *[skolko];
+    for(int i = 0; i < skolko; i++)
+    {
+        currentComponent[i] = new component();
+    }
+
+    int j = 0;
+
+    for(int i = 0; i < kolvo; i++)
+    {
+        if(components[i]->retType() == index.data(Qt::DisplayRole).toString() && j < skolko)
+        {
+            currentComponent[j] = components[i];
+            //ui->comboBoxFirm->addItem(currentComponent[j]->retFirm());
+            j++;
+        }
+    }
+
+    bool stat;
+
+    for(int i = 0; i < skolko; i++)
+    {
+        stat = true;
+        for(int m = 0; m < i; m++)
+        {
+            if(currentComponent[i]->retFirm() == currentComponent[m]->retFirm())
+            {
+                stat = false;
+                break;
+            }
+        }
+        if(stat)
+        {
+            ui->comboBoxFirm->addItem(currentComponent[i]->retFirm());
+        }
+    }
+
+    updateComboBoxFirm();
+}
+
+void MainWindow::updateComboBoxFirm()
+{
+    ui->comboBoxModel->clear();
+    bool stat;
+
+    for(int i = 0; i < skolko; i++)
+    {
+        stat = true;
+        if(currentComponent[i]->retFirm() == ui->comboBoxFirm->currentText())
+        {
+            for(int j = 0; j < ui->comboBoxModel->count(); j++)
+            {
+                if(currentComponent[i]->retCompModel() == ui->comboBoxModel->itemText(j))
+                {
+                    stat = false;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            continue;
+        }
+        if(stat)
+        {
+            ui->comboBoxModel->addItem(currentComponent[i]->retCompModel());
+        }
+    }
+    updateComboBoxModel();
+}
+
+void MainWindow::updateComboBoxModel()
+{
+    ui->comboBoxPrice->clear();
+
+    for(int i = 0; i < skolko; i++)
+    {
+
+        if(currentComponent[i]->retFirm() == ui->comboBoxFirm->currentText() && currentComponent[i]->retCompModel() == ui->comboBoxModel->currentText())
+        {
+            int n = currentComponent[i]->retPrice();
+            QString text = QString::number(n) +'$';
+            ui->comboBoxPrice->addItem(text);
+        }
+    }
+    updateComboBoxPrice();
+}
+
+void MainWindow::updateComboBoxPrice()
+{
+    for(int i = 0; i < skolko; i++)
+    {
+        QString price = QString::number(currentComponent[i]->retPrice()) + '$';
+        if(currentComponent[i]->retFirm() == ui->comboBoxFirm->currentText() && currentComponent[i]->retCompModel() == ui->comboBoxModel->currentText() && price == ui->comboBoxPrice->currentText())
+        {
+            ui->text->setText(currentComponent[i]->retParametrs());
+            if(currentComponent[i]->retAvailability())
+            {
+                ui->yOrN->setText("есть");
+            }
+            else
+            {
+                ui->yOrN->setText("нету");
+            }
+        }
+    }
 }

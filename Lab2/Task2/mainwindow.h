@@ -32,6 +32,14 @@ private slots:
     void openfile();
 
     void makeBase();
+
+    void currentComponentsInArray();
+
+    void updateComboBoxFirm();
+
+    void updateComboBoxModel();
+
+    void updateComboBoxPrice();
 private:
     Ui::MainWindow *ui;
     QListView *listView;
@@ -41,5 +49,8 @@ private:
     QString information;
     component **components;
     int kolvo;
+
+    int skolko;
+    component **currentComponent;
 };
 #endif // MAINWINDOW_H
