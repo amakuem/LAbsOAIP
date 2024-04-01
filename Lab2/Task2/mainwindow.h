@@ -40,6 +40,12 @@ private slots:
     void updateComboBoxModel();
 
     void updateComboBoxPrice();
+
+    void on_pushButton_3_clicked();
+
+
+    void on_pushButton_4_clicked();
+
 private:
     Ui::MainWindow *ui;
     QListView *listView;
@@ -52,5 +58,6 @@ private:
 
     int skolko;
     component **currentComponent;
+    bool current;
 };
 #endif // MAINWINDOW_H

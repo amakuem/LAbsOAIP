@@ -8,6 +8,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     listView = new QListView();
     model = new QStringListModel(this);
+
+    current = false;
     // QStringList l;
     // l << "Процессор" << "Видеокарта" << "Оперативная память" << "Материнская плата" << "Жесткий диск(HDD)" << "Твердотелый накопитель(SSD)" << "Блок питания" << "Корпус";
     // model->setStringList(l);
@@ -284,6 +286,7 @@ void MainWindow::currentComponentsInArray()
         }
     }
 
+    current = true;
     updateComboBoxFirm();
 }
 
@@ -354,3 +357,76 @@ void MainWindow::updateComboBoxPrice()
         }
     }
 }
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    if(current)
+    {
+        component *temp;
+        for(int i = 0; i < skolko; i++)
+        {
+            int min = currentComponent[i]->retPrice();
+            int min_pos = i;
+            for(int j = i + 1; j < skolko; j++)
+            {
+                if(currentComponent[j]->retPrice() < min)
+                {
+                    min = currentComponent[j]->retPrice();
+                    min_pos = j;
+                }
+            }
+            if(min != currentComponent[i]->retPrice())
+            {
+                temp = currentComponent[i];
+                currentComponent[i] = currentComponent[min_pos];
+                currentComponent[min_pos] = temp;
+            }
+        }
+
+        ui->listView->hide();
+        ui->tableView->show();
+
+        ui->tableView->setSelectionMode(QAbstractItemView::NoSelection);
+        model2->setRowCount(skolko);
+        model2->setColumnCount(5);
+
+        ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+        ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+        ui->tableView->horizontalHeader()->model()->setHeaderData(0, Qt::Horizontal, "Фирма");
+        ui->tableView->horizontalHeader()->model()->setHeaderData(1, Qt::Horizontal, "Модель");
+        ui->tableView->horizontalHeader()->model()->setHeaderData(2, Qt::Horizontal, "Парамметры");
+        ui->tableView->horizontalHeader()->model()->setHeaderData(3, Qt::Horizontal, "Цена");
+        ui->tableView->horizontalHeader()->model()->setHeaderData(4, Qt::Horizontal, "Наличие");
+
+
+        for(int i = 0; i < skolko; i++)
+        {
+            model2->setData(model2->index(i, 0), currentComponent[i]->retFirm());
+            model2->setData(model2->index(i, 1), currentComponent[i]->retCompModel());
+            model2->setData(model2->index(i, 2), currentComponent[i]->retParametrs());
+
+            QString text = QString::number(currentComponent[i]->retPrice()) + '$';
+            model2->setData(model2->index(i, 3), text);
+
+            if(currentComponent[i]->retAvailability())
+            {
+                model2->setData(model2->index(i, 4), "есть");
+            }
+            else
+            {
+                model2->setData(model2->index(i, 4), "нету");
+            }
+        }
+
+        updateComboBoxFirm();
+    }
+
+}
+
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    ui->tableView->hide();
+    ui->listView->show();
+}
+
