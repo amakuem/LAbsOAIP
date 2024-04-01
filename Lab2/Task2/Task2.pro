@@ -10,14 +10,17 @@ CONFIG += c++17
 
 SOURCES += \
     component.cpp \
+    dialogsearch.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     component.h \
+    dialogsearch.h \
     mainwindow.h
 
 FORMS += \
+    dialogsearch.ui \
     mainwindow.ui
 
 # Default rules for deployment.

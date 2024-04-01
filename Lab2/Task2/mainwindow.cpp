@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     model = new QStringListModel(this);
 
     current = false;
+    open = false;
     // QStringList l;
     // l << "Процессор" << "Видеокарта" << "Оперативная память" << "Материнская плата" << "Жесткий диск(HDD)" << "Твердотелый накопитель(SSD)" << "Блок питания" << "Корпус";
     // model->setStringList(l);
@@ -43,11 +44,14 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    QModelIndex index = ui->listView->currentIndex();
-    QString text = index.data(Qt::DisplayRole).toString();
+    if(open)
+    {
+        QModelIndex index = ui->listView->currentIndex();
+        QString text = index.data(Qt::DisplayRole).toString();
 
-    ui->label->setText(text);
-    currentComponentsInArray();
+        ui->label->setText(text);
+        currentComponentsInArray();
+    }
 }
 
 void MainWindow::openfile()
@@ -227,7 +231,7 @@ void MainWindow::makeBase()
     ui->listView->setModel(model);
     ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-
+    open = true;
 }
 
 void MainWindow::currentComponentsInArray()
@@ -430,3 +434,58 @@ void MainWindow::on_pushButton_4_clicked()
     ui->listView->show();
 }
 
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    if(open)
+    {
+        DialogSearch *dialog = new DialogSearch(this);
+        dialog->setComponents(components, kolvo);
+        connect(dialog, &DialogSearch::sendData, this, &MainWindow::receiveData);
+        dialog->exec();
+    }
+}
+
+void MainWindow::receiveData(const QString &searchType, const QString &searchFirm, const QString &searchModel)
+{
+    ui->comboBoxFirm->clear();
+    ui->comboBoxModel->clear();
+    ui->comboBoxPrice->clear();
+    ui->text->clear();
+    ui->yOrN->clear();
+    ui->tableView->hide();
+    ui->listView->show();
+
+    skolko = 0;
+
+    for(int i = 0; i < kolvo; i++)
+    {
+        if(components[i]->retType() == searchType && components[i]->retFirm() == searchFirm && components[i]->retCompModel() == searchModel)
+        {
+            skolko++;
+        }
+    }
+
+    currentComponent = new component *[skolko];
+    for(int i = 0; i < skolko; i++)
+    {
+        currentComponent[i] = new component();
+    }
+
+    int j = 0;
+
+    for(int i = 0; i < kolvo; i++)
+    {
+        if(components[i]->retType() == searchType && components[i]->retFirm() == searchFirm && components[i]->retCompModel() == searchModel && j < skolko)
+        {
+            currentComponent[j] = components[i];
+            j++;
+        }
+    }
+
+    ui->comboBoxFirm->addItem(searchFirm);
+    ui->comboBoxModel->addItem(searchModel);
+
+    current = true;
+    updateComboBoxModel();
+}

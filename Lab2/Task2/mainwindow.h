@@ -9,6 +9,7 @@
 #include <QFile>
 #include <QTextStream>
 #include "component.h"
+#include "dialogsearch.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -23,6 +24,9 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+public slots:
+    void receiveData(const QString &searchType, const QString &searchFirm, const QString &searchModel);
 
 private slots:
     void on_pushButton_clicked();
@@ -43,8 +47,9 @@ private slots:
 
     void on_pushButton_3_clicked();
 
-
     void on_pushButton_4_clicked();
+
+    void on_pushButton_5_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -59,5 +64,6 @@ private:
     int skolko;
     component **currentComponent;
     bool current;
+    bool open;
 };
 #endif // MAINWINDOW_H
