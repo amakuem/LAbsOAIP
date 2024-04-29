@@ -8,6 +8,9 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QTextStream>
+#include <QDebug>
+#include <QInputDialog>
+#include <unordered_set>
 #include "component.h"
 #include "dialogsearch.h"
 
@@ -50,6 +53,12 @@ private slots:
     void on_pushButton_4_clicked();
 
     void on_pushButton_5_clicked();
+
+    void createSets(int minPrice, int maxPrice);
+
+    void createSetsRec(int i, int currentPrice, int minPrice, int maxPrice, component** &currentSet, int &currentSetSize, std::unordered_set<QString> &currentTypes, int &maxSize, int &setNumber);
+
+    void on_pushButton_6_clicked();
 
 private:
     Ui::MainWindow *ui;

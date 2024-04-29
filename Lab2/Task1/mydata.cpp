@@ -206,7 +206,7 @@ mydata mydata::NextDay()
         month += QString::number(m);
         year = QString::number(y);
     }
-    else if((m != 1 || m != 2 || m != 3 || m != 5 || m !=7 || m != 8 || m != 10 || m != 12) && (d + 1 > 30))
+    else if((m != 1 || m != 2 || m != 3 || m != 5 || m !=7 || m != 8 || m != 10) && m != 12 && (d + 1 > 30))
     {
         m++;
         if(m / 10 == 0)
@@ -219,7 +219,7 @@ mydata mydata::NextDay()
         day += QString::number(d);
         year = QString::number(y);
     }
-    else if((m != 1 || m != 2 || m != 3 || m != 5 || m !=7 || m != 8 || m != 10 || m != 12) && (d + 1 <= 30))
+    else if((m != 1 || m != 2 || m != 3 || m != 5 || m !=7 || m != 8 || m != 10) && m != 12 && (d + 1 <= 30))
     {
         d++;
         if(d / 10 == 0)

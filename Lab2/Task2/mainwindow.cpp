@@ -21,6 +21,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     model2 = new QStandardItemModel(this);
     ui->tableView->setModel(model2);
+
+    model2->setColumnCount(5);
+    ui->tableView->setSelectionMode(QAbstractItemView::NoSelection);
+
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableView->horizontalHeader()->model()->setHeaderData(0, Qt::Horizontal, "Фирма");
+    ui->tableView->horizontalHeader()->model()->setHeaderData(1, Qt::Horizontal, "Модель");
+    ui->tableView->horizontalHeader()->model()->setHeaderData(2, Qt::Horizontal, "Парамметры");
+    ui->tableView->horizontalHeader()->model()->setHeaderData(3, Qt::Horizontal, "Цена");
+    ui->tableView->horizontalHeader()->model()->setHeaderData(4, Qt::Horizontal, "Наличие");
+
     ui->tableView->hide();
 
     connect(ui->comboBoxFirm, SIGNAL(activated(int)), this, SLOT(updateComboBoxFirm()));
@@ -46,10 +58,10 @@ void MainWindow::on_pushButton_2_clicked()
 {
     if(open)
     {
-        QModelIndex index = ui->listView->currentIndex();
-        QString text = index.data(Qt::DisplayRole).toString();
+        //QModelIndex index = ui->listView->currentIndex();
+        //QString text = index.data(Qt::DisplayRole).toString();
 
-        ui->label->setText(text);
+
         currentComponentsInArray();
     }
 }
@@ -123,6 +135,8 @@ void MainWindow::makeBase()
     temp = "";
     schet = 1;
     int j = 0;
+
+    text += '\n';
 
     components = new component *[kolvo];
     for(int i = 0; i < kolvo; i++)
@@ -202,6 +216,7 @@ void MainWindow::makeBase()
             continue;
         }
         temp += text[i];
+
     }
 
     QStringList l;
@@ -390,17 +405,11 @@ void MainWindow::on_pushButton_3_clicked()
         ui->listView->hide();
         ui->tableView->show();
 
-        ui->tableView->setSelectionMode(QAbstractItemView::NoSelection);
-        model2->setRowCount(skolko);
-        model2->setColumnCount(5);
+        ui->tableView->clearSpans();
 
-        ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-        ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-        ui->tableView->horizontalHeader()->model()->setHeaderData(0, Qt::Horizontal, "Фирма");
-        ui->tableView->horizontalHeader()->model()->setHeaderData(1, Qt::Horizontal, "Модель");
-        ui->tableView->horizontalHeader()->model()->setHeaderData(2, Qt::Horizontal, "Парамметры");
-        ui->tableView->horizontalHeader()->model()->setHeaderData(3, Qt::Horizontal, "Цена");
-        ui->tableView->horizontalHeader()->model()->setHeaderData(4, Qt::Horizontal, "Наличие");
+        model2->setRowCount(skolko);
+
+
 
 
         for(int i = 0; i < skolko; i++)
@@ -489,3 +498,86 @@ void MainWindow::receiveData(const QString &searchType, const QString &searchFir
     current = true;
     updateComboBoxModel();
 }
+
+void MainWindow::createSets(int minPrice, int maxPrice) {
+    ui->listView->hide();
+    ui->tableView->show();
+    ui->tableView->clearMask();
+    model2->setRowCount(0);
+
+    component** currentSet = new component*[8];
+    int currentSetSize = 0;
+    std::unordered_set<QString> currentTypes;
+    int maxSize = 0;
+    int setNumber = 1;
+
+    createSetsRec(0, 0, minPrice, maxPrice, currentSet, currentSetSize, currentTypes, maxSize, setNumber);
+
+    delete[] currentSet;
+
+}
+
+void MainWindow::createSetsRec(int i, int currentPrice, int minPrice, int maxPrice, component** &currentSet, int &currentSetSize, std::unordered_set<QString> &currentTypes, int &maxSize, int &setNumber) {
+    if (i >= kolvo) return;
+
+    if (currentTypes.find(components[i]->retType()) == currentTypes.end() && currentSetSize < 8) {
+        currentSet[currentSetSize++] = components[i];
+        currentTypes.insert(components[i]->retType());
+        currentPrice += components[i]->retPrice();
+
+        if (currentSetSize > maxSize) {
+            maxSize = currentSetSize;
+        }
+
+        if (currentPrice >= minPrice && currentPrice <= maxPrice && currentSetSize > 1 && currentSetSize == maxSize) {
+            QList<QStandardItem *> items;
+            items.append(new QStandardItem(QString("Комплект %1").arg(setNumber++)));
+            model2->appendRow(items);
+            ui->tableView->setSpan(model2->rowCount()-1, 0, 1, 5);
+
+            for (int j = 0; j < currentSetSize; ++j) {
+                QList<QStandardItem *> items;
+                items.append(new QStandardItem(currentSet[j]->retFirm()));
+                items.append(new QStandardItem(currentSet[j]->retCompModel()));
+                items.append(new QStandardItem(currentSet[j]->retParametrs()));
+                items.append(new QStandardItem(QString::number(currentSet[j]->retPrice()) + '$'));
+                if(currentSet[j]->retAvailability())
+                {
+                    items.append(new QStandardItem("есть"));
+                }
+                else
+                {
+                    items.append(new QStandardItem("нету"));
+                }
+
+                model2->appendRow(items);
+            }
+        }
+
+        createSetsRec(i + 1, currentPrice, minPrice, maxPrice, currentSet, currentSetSize, currentTypes, maxSize, setNumber);
+
+        --currentSetSize;
+        currentTypes.erase(components[i]->retType());
+        currentPrice -= components[i]->retPrice();
+    }
+
+    createSetsRec(i + 1, currentPrice, minPrice, maxPrice, currentSet, currentSetSize, currentTypes, maxSize, setNumber);
+}
+
+void MainWindow::on_pushButton_6_clicked()
+{
+    if(open)
+    {
+        bool ok;
+        int minPrice = QInputDialog::getInt(this, tr("Введите минимальную цену"),
+                                            tr("Минимальная цена:"), 0, 0, 1000000, 1, &ok);
+        if (ok) {
+            int maxPrice = QInputDialog::getInt(this, tr("Введите максимальную цену"),
+                                                tr("Максимальная цена:"), 0, 5000, 1000000, 1, &ok);
+            if (ok) {
+                createSets(minPrice, maxPrice);
+            }
+        }
+    }
+}
+

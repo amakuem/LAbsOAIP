@@ -10,24 +10,6 @@ MainWindow::MainWindow(QWidget *parent)
     model = new QStandardItemModel(this);
     ui->tableView->setModel(model);
 
-
-    // ui->tableView->setSelectionMode(QAbstractItemView::NoSelection);
-    // ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    // ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    // model->setRowCount(10);
-    // model->setColumnCount(8);
-    // ui->tableView->horizontalHeader()->model()->setHeaderData(0, Qt::Horizontal, "Дата");
-    // ui->tableView->horizontalHeader()->model()->setHeaderData(1, Qt::Horizontal, "След. день");
-    // ui->tableView->horizontalHeader()->model()->setHeaderData(2, Qt::Horizontal, "Дата - След. дата");
-    // ui->tableView->horizontalHeader()->model()->setHeaderData(3, Qt::Horizontal, "Пред. день");
-    // ui->tableView->horizontalHeader()->model()->setHeaderData(4, Qt::Horizontal, "Тип года");
-    // ui->tableView->horizontalHeader()->model()->setHeaderData(5, Qt::Horizontal, "День недели");
-    // ui->tableView->horizontalHeader()->model()->setHeaderData(6, Qt::Horizontal, "Дата - д.р.");
-    // ui->tableView->horizontalHeader()->model()->setHeaderData(7, Qt::Horizontal, "Тек. дата - данной");
-
-    //moyaDate->set(model, index);
-
-
 }
 
 MainWindow::~MainWindow()
@@ -38,7 +20,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_clicked()
 {
     pathFile = QFileDialog::getOpenFileName(0, "Открыть файл","/home/skibidi-dop", "*txt");
-    ui->label->setText(pathFile);
+
     getInformation();
 }
 
@@ -58,7 +40,7 @@ void MainWindow::getInformation()
         moidates += in.readLine();
         moidates += '\n';
     }
-    ui->label->setText(moidates);
+
     //moidates.;
     file.close();
     makeTable();
@@ -157,11 +139,6 @@ void MainWindow::makeTable()
 
         moyaDate[i]->set(model, index);
     }
-
-    ui->label_2->setText(moyaDate[0]->ret());
-    ui->label_3->setText(moyaDate[1]->ret());
-
-
 
 }
 
