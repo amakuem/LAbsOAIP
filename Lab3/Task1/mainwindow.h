@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMessageBox>
+#include <QMouseEvent>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -16,8 +18,14 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    QString recurse(int a, double b, int k);
+    void changeLien();
+    void getNumber();
 
 private:
     Ui::MainWindow *ui;
+    double number;
+    double binaryNumber;
+    bool status;
 };
 #endif // MAINWINDOW_H
