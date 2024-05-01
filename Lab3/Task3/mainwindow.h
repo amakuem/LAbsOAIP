@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMessageBox>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -16,8 +17,12 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
+    void getNumber();
+    int reverse(int n, int r);
+    void changeLien();
 private:
     Ui::MainWindow *ui;
+    int number;
+    int reversNumber;
 };
 #endif // MAINWINDOW_H
