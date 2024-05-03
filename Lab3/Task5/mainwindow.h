@@ -21,7 +21,10 @@ public:
 private slots:
     void on_pushButton_clicked();
 
-    void count(QDir& dir, int& filesCount, int& subFoldersCount);
+    void countFile(QDir& dir, int& filesCount);
+
+    void countDirectory(QDir& dir, int& subFoldersCount);
+
 
 private:
     Ui::MainWindow *ui;

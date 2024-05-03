@@ -24,7 +24,7 @@ void MainWindow::on_pushButton_clicked()
     }
     else
     {
-        QMessageBox::critical(0, "Ошибка", "Количество колец должно быть больше нуля, чтобы запустить анимацию");
+        QMessageBox::critical(0, "Ошибка", "Количество колец должно быть больше нуля");
     }
 }
 
@@ -109,20 +109,20 @@ void MainWindow::hanoi(int n, Ring**& from, Ring**& to, Ring**& aux, int& sizeFr
         ui->label_2->setText(QString::number(count));
 
         Ring* ring = from[sizeFrom-1];
-        Ring** newFrom = new Ring*[sizeFrom - 1]; // выделяем память для нового массива
+        Ring** newFrom = new Ring*[sizeFrom - 1];
         for(int i = 0; i < sizeFrom - 1; i++) {
-            newFrom[i] = from[i]; // копируем старые элементы
+            newFrom[i] = from[i];
         }
-        delete[] from; // удаляем старый массив
-        from = newFrom; // обновляем указатель
+        delete[] from;
+        from = newFrom;
         sizeFrom--;
-        moveRing(ring, x2, 500 - (sizeTo+1)*30); // перемещаем прямоугольник на новую позицию
-        Ring** newTo = new Ring*[sizeTo + 1]; // выделяем память для нового элемента
+        moveRing(ring, x2, 500 - (sizeTo+1)*30);
+        Ring** newTo = new Ring*[sizeTo + 1];
         for(int i = 0; i < sizeTo; i++) {
-            newTo[i] = to[i]; // копируем старые элементы
+            newTo[i] = to[i];
         }
-        newTo[sizeTo] = ring; // добавляем новый элемент
-        to = newTo; // обновляем указатель
+        newTo[sizeTo] = ring;
+        to = newTo;
         sizeTo++;
         return;
     }

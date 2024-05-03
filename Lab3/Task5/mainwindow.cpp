@@ -19,23 +19,47 @@ void MainWindow::on_pushButton_clicked()
     QDir dir(mainDir);
     int subFoldersCount = 0;
     int filesCount = 0;
-    count(dir, filesCount, subFoldersCount);
+    countDirectory(dir, subFoldersCount);
+    countFile(dir, filesCount);
 
     ui -> label_2 -> setText(QString::number(subFoldersCount));
     ui -> label_4 -> setText(QString::number(filesCount));
 }
 
-void MainWindow::count(QDir& dir, int& filesCount, int& subFoldersCount)
+void MainWindow::countDirectory(QDir &dir, int &subFoldersCount)
 {
     QFileInfoList files = dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
     for (QFileInfo& file : files) {
         if (file.isDir()) {
             subFoldersCount++;
             QDir dir_2(file.filePath());
-            count(dir_2, filesCount, subFoldersCount);
-        }
-        else if (file.isFile()) {
-            filesCount++;
+            countDirectory(dir_2, subFoldersCount);
         }
     }
 }
+
+void MainWindow::countFile(QDir &dir, int& filesCount)
+{
+    QFileInfoList files = dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+    for (QFileInfo& file : files) {
+        if (file.isFile())
+        {
+            filesCount++;
+            QDir dir_2(file.filePath());
+            countFile(dir_2, filesCount);
+        }
+    }
+}
+     // void countFolderAndFiles(QDir& dir, int& filesCount, int& subFoldersCount) {
+     //     QFileInfoList files = dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+     //     for (QFileInfo& file : files) {
+     //         if (file.isDir()) {
+     //             subFoldersCount++;
+     //             QDir dir_2(file.filePath());
+     //             countFolderAndFiles(dir_2, filesCount, subFoldersCount);
+     //         }
+     //         else if (file.isFile()) {
+     //             filesCount++;
+     //         }
+     //     }
+     // }
