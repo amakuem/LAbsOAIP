@@ -30,9 +30,10 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    int m_size = 100;
+    int m_size = 400;
     int* m_data = nullptr;
     int* tempData = nullptr;
+
 
     void merge(int l, int m, int r);
     void mergeSort(int l, int r);
@@ -40,5 +41,7 @@ private:
     void heapSort(int n);
     int partition(int low, int high);
     void quickSort(int low, int high);
+    void delay(int time);
+    void chooseSort();
 };
 #endif // MAINWINDOW_H

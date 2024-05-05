@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_data = new int[m_size];
     tempData = new int[m_size];
     for (int i = 0; i < m_size; ++i) {
-        m_data[i] = rand() % 200;
+        m_data[i] = rand() % 340;
         tempData[i] = m_data[i];
     }
 
@@ -23,13 +23,14 @@ MainWindow::~MainWindow()
 void MainWindow::paintEvent(QPaintEvent*) {
     QPainter painter(this);
 
-    painter.drawRect(20, 20, 600, 350);
-    painter.setBrush(Qt::blue);
+    painter.drawRect(219, 40, 800, 500);
+    painter.setBrush(Qt::red);
 
     if (m_size != 0) {
-        int w = 600 / m_size;
+        int w = 800 / m_size;
         for(int i = 0; i < m_size; ++i) {
-            painter.drawRect(20 + i * w, 370, w, -m_data[i]);
+            //painter.drawRect(20 + i * w, 370, w, -m_data[i]);
+            painter.drawRect(219 + i * w, 540, w, -m_data[i]);
         }
     }
 }
@@ -53,9 +54,15 @@ void MainWindow::merge(int l, int m, int r)
         if (tempData[i] <= tempData[n1 + j]) {
             m_data[k] = tempData[i];
             i++;
+
+            delay(0.5);
+            update();
         } else {
             m_data[k] = tempData[n1 + j];
             j++;
+
+            delay(0.5);
+            update();
         }
         k++;
     }
@@ -71,8 +78,7 @@ void MainWindow::merge(int l, int m, int r)
         j++;
         k++;
     }
-    QTimer::singleShot(100, this, [=] { update(); });
-    //update();
+
 }
 
 void MainWindow::mergeSort(int l, int r)
@@ -83,8 +89,8 @@ void MainWindow::mergeSort(int l, int r)
         mergeSort(l, m);
         mergeSort(m + 1, r);
 
-        //QTimer::singleShot(1000, this, [=] { merge(l, m, r); });
         merge(l, m, r);
+
     }
 }
 
@@ -94,6 +100,7 @@ void MainWindow::heapify(int n, int i)
     int left = 2 * i + 1;
     int right = 2 * i + 2;
 
+
     if (left < n && m_data[left] > m_data[largest])
         largest = left;
 
@@ -102,6 +109,10 @@ void MainWindow::heapify(int n, int i)
 
     if (largest != i) {
         std::swap(m_data[i], m_data[largest]);
+
+        delay(0.5);
+        update();
+
         heapify(n, largest);
     }
     update();
@@ -127,10 +138,16 @@ int MainWindow::partition(int low, int high)
         if (m_data[j] < pivot) {
             i++;
             std::swap(m_data[i], m_data[j]);
+
+            delay(0.5);
+            update();
         }
     }
     std::swap(m_data[i + 1], m_data[high]);
+
+    delay(0.5);
     update();
+
     return (i + 1);
 }
 
@@ -146,6 +163,28 @@ void MainWindow::quickSort(int low, int high)
 
 void MainWindow::on_pushButton_clicked()
 {
+    if(ui->comboBox->currentIndex() == 0)
+    {
         mergeSort(0, m_size - 1);
+    }
+    else if(ui->comboBox->currentIndex() == 1)
+    {
+        quickSort(0, m_size - 1);
+    }
+    else if(ui->comboBox->currentIndex() == 2)
+    {
+        heapSort(m_size);
+    }
 }
 
+void MainWindow::delay(int time)
+{
+    QEventLoop loop;
+    QTimer::singleShot(time, &loop, &QEventLoop::quit);
+    loop.exec();
+}
+
+void MainWindow::chooseSort()
+{
+
+}
