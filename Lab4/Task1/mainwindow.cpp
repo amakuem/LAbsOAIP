@@ -13,6 +13,12 @@ MainWindow::MainWindow(QWidget *parent)
         tempData[i] = m_data[i];
     }
 
+    isSorted = false;
+    isNumberGood = false;
+
+    connect(ui->lineEdit, &QLineEdit::returnPressed, this, &MainWindow::getNumber);
+    connect(ui->lineEdit, &QLineEdit::cursorPositionChanged, this, &MainWindow::lineChanged);
+
 }
 
 MainWindow::~MainWindow()
@@ -37,7 +43,6 @@ void MainWindow::paintEvent(QPaintEvent*) {
 
 void MainWindow::merge(int l, int m, int r)
 {
-
     int i, j, k;
     int n1 = m - l + 1;
     int n2 = r - m;
@@ -90,7 +95,6 @@ void MainWindow::mergeSort(int l, int r)
         mergeSort(m + 1, r);
 
         merge(l, m, r);
-
     }
 }
 
@@ -163,17 +167,29 @@ void MainWindow::quickSort(int low, int high)
 
 void MainWindow::on_pushButton_clicked()
 {
-    if(ui->comboBox->currentIndex() == 0)
+    if(!isSorted)
     {
-        mergeSort(0, m_size - 1);
-    }
-    else if(ui->comboBox->currentIndex() == 1)
-    {
-        quickSort(0, m_size - 1);
-    }
-    else if(ui->comboBox->currentIndex() == 2)
-    {
-        heapSort(m_size);
+        ui->pushButton->setDisabled(true);
+        ui->lineEdit->setDisabled(true);
+
+        if(ui->comboBox->currentIndex() == 0)
+        {
+            isSorted = true;
+            mergeSort(0, m_size - 1);
+        }
+        else if(ui->comboBox->currentIndex() == 1)
+        {
+            isSorted = true;
+            quickSort(0, m_size - 1);
+        }
+        else if(ui->comboBox->currentIndex() == 2)
+        {
+            isSorted = true;
+            heapSort(m_size);
+        }
+
+        ui->pushButton->setEnabled(true);
+        ui->lineEdit->setEnabled(true);
     }
 }
 
@@ -184,7 +200,52 @@ void MainWindow::delay(int time)
     loop.exec();
 }
 
-void MainWindow::chooseSort()
+void MainWindow::getNumber()
 {
-
+    bool ok;
+    numberForBinarySearch = ui->lineEdit->text().toInt(&ok);
+    if(!ok)
+    {
+        isNumberGood = false;
+        QMessageBox::warning(this, "Ошибка", "Введенное значение не является числом");
+    }
+    else
+    {
+        isNumberGood = true;
+        ui->lineEdit->setReadOnly(true);
+    }
+    setIndexOfNumber();
 }
+
+void MainWindow::lineChanged()
+{
+    ui->lineEdit->setReadOnly(false);
+}
+
+int MainWindow::binarySearch()
+{
+    int left = 0;
+    int right = m_size - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (m_data[mid] == numberForBinarySearch)
+            return mid;
+        if (m_data[mid] < numberForBinarySearch)
+            left = mid + 1;
+        else
+            right = mid - 1;
+    }
+    return -1;  // если число не найдено
+}
+
+void MainWindow::setIndexOfNumber()
+{
+    if(!isSorted && !isNumberGood)
+    {
+        QMessageBox::warning(this, "Ошибка", "Массив должен быть отсортирован");
+        return ;
+    }
+    int index = binarySearch();
+    ui->label_3->setText(QString::number(index));
+}
+

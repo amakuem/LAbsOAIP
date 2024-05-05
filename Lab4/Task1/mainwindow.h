@@ -33,6 +33,9 @@ private:
     int m_size = 400;
     int* m_data = nullptr;
     int* tempData = nullptr;
+    int numberForBinarySearch;
+    bool isSorted;
+    bool isNumberGood;
 
 
     void merge(int l, int m, int r);
@@ -42,6 +45,11 @@ private:
     int partition(int low, int high);
     void quickSort(int low, int high);
     void delay(int time);
-    void chooseSort();
+    int binarySearch();
+    void setIndexOfNumber();
+
+
+    void getNumber();
+    void lineChanged();
 };
 #endif // MAINWINDOW_H
