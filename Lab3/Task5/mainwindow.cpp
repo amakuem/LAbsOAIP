@@ -50,16 +50,4 @@ void MainWindow::countFile(QDir &dir, int& filesCount)
         }
     }
 }
-     // void countFolderAndFiles(QDir& dir, int& filesCount, int& subFoldersCount) {
-     //     QFileInfoList files = dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-     //     for (QFileInfo& file : files) {
-     //         if (file.isDir()) {
-     //             subFoldersCount++;
-     //             QDir dir_2(file.filePath());
-     //             countFolderAndFiles(dir_2, filesCount, subFoldersCount);
-     //         }
-     //         else if (file.isFile()) {
-     //             filesCount++;
-     //         }
-     //     }
-     // }
+
